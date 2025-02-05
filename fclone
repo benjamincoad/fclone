@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+import shutil
+import os
+from pathlib import Path
+import argparse
+
+def clone_file(source: str, destination: str, new_name: str = None) -> None:
+    """
+    Clone a file to a destination folder, optionally with a new name.
+    
+    Args:
+        source: Path to the source file
+        destination: Path to the destination folder
+        new_name: Optional new name for the cloned file
+    """
+    source_path = Path(source)
+    dest_path = Path(destination)
+    
+    # Verify source exists
+    if not source_path.is_file():
+        raise FileNotFoundError(f"Source file not found: {source_path}")
+    
+    # Create destination directory if it doesn't exist
+    dest_path.mkdir(parents=True, exist_ok=True)
+    
+    # Determine destination file path
+    if new_name:
+        dest_file = dest_path / new_name
+    else:
+        dest_file = dest_path / source_path.name
+        
+    # Check if destination file already exists
+    if dest_file.exists():
+        raise FileExistsError(f"Destination file already exists: {dest_file}")
+    
+    # Copy the file
+    shutil.copy2(source_path, dest_file)
+    print(f"Successfully cloned {source_path} to {dest_file}")
+
+def main():
+    parser = argparse.ArgumentParser(description="Clone a file to another location")
+    parser.add_argument("source", help="Source file to clone")
+    parser.add_argument("destination", help="Destination folder")
+    parser.add_argument("--name", "-n", help="New name for the cloned file")
+    
+    args = parser.parse_args()
+    
+    try:
+        clone_file(args.source, args.destination, args.name)
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    main()
